@@ -1,0 +1,84 @@
+﻿@using Microsoft.AspNetCore.Html
+@using Newtonsoft.Json
+@using Newtonsoft.Json.Linq
+@model IEnumerable<DevIO.App.Extensions.Auditoria.AuditoriaViewModel>
+
+@{
+    ViewData["Title"] = "Logs de Auditoria";
+}
+
+<h1>Logs de Auditoria</h1>
+
+@if (Model != null && Model.Any())
+{
+    <div class="mt-4">
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Data Ocorrência</th>
+                    <th>Sistema</th>
+                    <th>Usuário</th>
+                    <th>IP</th>
+                    <th>SO</th>
+                    <th>Browser</th>
+                    <th>Mobile</th>
+                    <th>Ação</th>
+                    <th>Descrição</th>
+                    <th>Modelo</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in Model)
+                {
+                    <tr>
+                        <td>@log.DataOcorrencia.ToString("g")</td>
+                        <td>@log.Sistema</td>
+                        <td>@log.UserName</td>
+                        <td>@log.Ip</td>
+                        <td>@log.SistemaOperacional</td>
+                        <td>@log.Browser</td>
+                        <td>@log.Mobile</td>
+                        <td>@log.Acao</td>
+                        <td>@log.Descricao</td>
+                        <td>
+                            <div>
+                                @if (!string.IsNullOrEmpty(log.Model))
+                                {
+                                    <!-- Button trigger modal -->
+                                    <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#jsonModelModal-@log.Id">
+                                        Visualizar Modelo
+                                    </button>
+
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="jsonModelModal-@log.Id" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Dados do Formulário</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <pre>@(new HtmlString(JToken.Parse(log.Model).ToString(Formatting.Indented)));</pre>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>Nenhum log de auditoria encontrado para o usuário selecionado.</p>
+}
